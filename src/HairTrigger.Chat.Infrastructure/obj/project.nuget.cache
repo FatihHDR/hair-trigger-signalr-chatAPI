@@ -23,5 +23,15 @@
     "C:\\Users\\narut\\.nuget\\packages\\stackexchange.redis\\2.10.1\\stackexchange.redis.2.10.1.nupkg.sha512",
     "C:\\Users\\narut\\.nuget\\packages\\system.io.hashing\\9.0.10\\system.io.hashing.9.0.10.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "NU1900",
+      "level": "Warning",
+      "message": "Error occurred while getting package vulnerability data: There is not enough space on the disk. : 'C:\\Users\\narut\\AppData\\Local\\NuGet\\v3-cache\\670c1461c29885f9aa22c281d8b7da90845b38e4$ps_api.nuget.org_v3_index.json\\vuln_data_base.dat-new'.",
+      "projectPath": "D:\\hair-trigger-signalr-chat\\src\\HairTrigger.Chat.Infrastructure\\HairTrigger.Chat.Infrastructure.csproj",
+      "warningLevel": 1,
+      "filePath": "D:\\hair-trigger-signalr-chat\\src\\HairTrigger.Chat.Infrastructure\\HairTrigger.Chat.Infrastructure.csproj",
+      "targetGraphs": []
+    }
+  ]
 }
