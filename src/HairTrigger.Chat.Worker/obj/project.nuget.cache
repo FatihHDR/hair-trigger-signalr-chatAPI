@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "WtuzUQNyWSc=",
+  "dgSpecHash": "SA1OhgCWnUA=",
   "success": true,
   "projectFilePath": "D:\\hair-trigger-signalr-chat\\src\\HairTrigger.Chat.Worker\\HairTrigger.Chat.Worker.csproj",
   "expectedPackageFiles": [
@@ -42,6 +42,7 @@
     "C:\\Users\\narut\\.nuget\\packages\\opentelemetry\\1.14.0\\opentelemetry.1.14.0.nupkg.sha512",
     "C:\\Users\\narut\\.nuget\\packages\\opentelemetry.api\\1.14.0\\opentelemetry.api.1.14.0.nupkg.sha512",
     "C:\\Users\\narut\\.nuget\\packages\\opentelemetry.api.providerbuilderextensions\\1.14.0\\opentelemetry.api.providerbuilderextensions.1.14.0.nupkg.sha512",
+    "C:\\Users\\narut\\.nuget\\packages\\opentelemetry.exporter.console\\1.10.0\\opentelemetry.exporter.console.1.10.0.nupkg.sha512",
     "C:\\Users\\narut\\.nuget\\packages\\opentelemetry.extensions.hosting\\1.14.0\\opentelemetry.extensions.hosting.1.14.0.nupkg.sha512",
     "C:\\Users\\narut\\.nuget\\packages\\pipelines.sockets.unofficial\\2.2.8\\pipelines.sockets.unofficial.2.2.8.nupkg.sha512",
     "C:\\Users\\narut\\.nuget\\packages\\stackexchange.redis\\2.10.1\\stackexchange.redis.2.10.1.nupkg.sha512",

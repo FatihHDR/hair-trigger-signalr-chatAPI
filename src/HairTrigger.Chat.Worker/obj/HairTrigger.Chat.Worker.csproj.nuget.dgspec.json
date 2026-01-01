@@ -745,6 +745,10 @@
               "target": "Package",
               "version": "[10.0.1, )"
             },
+            "OpenTelemetry.Exporter.Console": {
+              "target": "Package",
+              "version": "[1.10.0, )"
+            },
             "OpenTelemetry.Extensions.Hosting": {
               "target": "Package",
               "version": "[1.14.0, )"
