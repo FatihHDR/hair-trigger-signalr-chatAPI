@@ -1,6 +1,0 @@
-@hair_trigger_signalr_chat_HostAddress = http://localhost:5234
-
-GET {{hair_trigger_signalr_chat_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
