@@ -1,6 +1,9 @@
+using HairTrigger.Chat.Domain.Entities;
 using HairTrigger.Chat.Domain.Interfaces;
 using HairTrigger.Chat.Infrastructure.Data;
 using HairTrigger.Chat.Infrastructure.Repositories;
+using HairTrigger.Chat.Infrastructure.Queue;
+using HairTrigger.Chat.Domain.Queue;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,13 +30,27 @@ public static class DependencyInjection
         var redisConnectionString = configuration.GetConnectionString("Redis");
         if (!string.IsNullOrEmpty(redisConnectionString))
         {
-            services.AddSingleton<IConnectionMultiplexer>(
-                ConnectionMultiplexer.Connect(redisConnectionString));
+            services.AddSingleton<IConnectionMultiplexer>(sp =>
+            {
+                var config = ConfigurationOptions.Parse(redisConnectionString);
+                config.AbortOnConnectFail = false;
+                return ConnectionMultiplexer.Connect(config);
+            });
+            
+            // Register Redis message queue
+            services.AddSingleton<IMessageQueue, RedisMessageQueue>();
+        }
+        else
+        {
+            // Use in-memory queue for development without Redis
+            services.AddSingleton<IMessageQueue, InMemoryMessageQueue>();
         }
 
         // Register repositories
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IChannelRepository, ChannelRepository>();
         services.AddScoped<IMessageRepository, MessageRepository>();
-        services.AddScoped<IRoomRepository, RoomRepository>();
+        services.AddScoped<IDeliveryStatusRepository, DeliveryStatusRepository>();
 
         return services;
     }
