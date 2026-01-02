@@ -51,6 +51,12 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
+// Seed database with test data
+if (app.Environment.IsDevelopment())
+{
+    await HairTrigger.Chat.Infrastructure.Data.SeedData.SeedAsync(app.Services);
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
