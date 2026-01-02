@@ -40,7 +40,8 @@ public class RedisMessageQueue : IMessageQueue
         if (value.IsNullOrEmpty)
             return null;
         
-        var wrapper = JsonSerializer.Deserialize<QueueMessageWrapper>(value!);
+        var valueString = value.ToString();
+        var wrapper = JsonSerializer.Deserialize<QueueMessageWrapper>(valueString);
         if (wrapper == null)
             return null;
         
