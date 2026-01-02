@@ -1,5 +1,6 @@
 using HairTrigger.Chat.Api.Hubs;
 using HairTrigger.Chat.Infrastructure;
+using Microsoft.OpenApi.Models;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
@@ -50,15 +51,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    options.SwaggerDoc("v1", new OpenApiInfo
     {
         Version = "v1",
         Title = "HairTrigger Chat API",
-        Description = "Real-time chat API with SignalR hub support",
-        Contact = new Microsoft.OpenApi.Models.OpenApiContact
-        {
-            Name = "HairTrigger Team"
-        }
+        Description = "Real-time chat API with SignalR hub support"
     });
 });
 
