@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace HairTrigger.Chat.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/v1/messages")]
 [Produces("application/json")]
 public class MessagesController : ControllerBase
 {

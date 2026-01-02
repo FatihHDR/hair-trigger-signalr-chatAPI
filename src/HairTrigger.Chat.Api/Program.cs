@@ -54,8 +54,8 @@ builder.Services.AddSwaggerGen(options =>
     options.SwaggerDoc("v1", new OpenApiInfo
     {
         Version = "v1",
-        Title = "HairTrigger Chat API",
-        Description = "Real-time chat API with SignalR hub support"
+        Title = "HairTrigger Chat API v1",
+        Description = "Real-time chat API with SignalR hub support."
     });
 });
 
