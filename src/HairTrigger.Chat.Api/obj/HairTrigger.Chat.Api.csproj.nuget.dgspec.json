@@ -1,38 +1,36 @@
 {
   "format": 1,
   "restore": {
-    "D:\\hair-trigger-signalr-chat\\src\\HairTrigger.Chat.Api\\HairTrigger.Chat.Api.csproj": {}
+    "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Api/HairTrigger.Chat.Api.csproj": {}
   },
   "projects": {
-    "D:\\hair-trigger-signalr-chat\\src\\HairTrigger.Chat.Api\\HairTrigger.Chat.Api.csproj": {
+    "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Api/HairTrigger.Chat.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\hair-trigger-signalr-chat\\src\\HairTrigger.Chat.Api\\HairTrigger.Chat.Api.csproj",
+        "projectUniqueName": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Api/HairTrigger.Chat.Api.csproj",
         "projectName": "HairTrigger.Chat.Api",
-        "projectPath": "D:\\hair-trigger-signalr-chat\\src\\HairTrigger.Chat.Api\\HairTrigger.Chat.Api.csproj",
-        "packagesPath": "C:\\Users\\narut\\.nuget\\packages\\",
-        "outputPath": "D:\\hair-trigger-signalr-chat\\src\\HairTrigger.Chat.Api\\obj\\",
+        "projectPath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Api/HairTrigger.Chat.Api.csproj",
+        "packagesPath": "/home/fatih/.nuget/packages/",
+        "outputPath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Api/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\narut\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/home/fatih/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "D:\\hair-trigger-signalr-chat\\src\\HairTrigger.Chat.Domain\\HairTrigger.Chat.Domain.csproj": {
-                "projectPath": "D:\\hair-trigger-signalr-chat\\src\\HairTrigger.Chat.Domain\\HairTrigger.Chat.Domain.csproj"
+              "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Domain/HairTrigger.Chat.Domain.csproj": {
+                "projectPath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Domain/HairTrigger.Chat.Domain.csproj"
               },
-              "D:\\hair-trigger-signalr-chat\\src\\HairTrigger.Chat.Infrastructure\\HairTrigger.Chat.Infrastructure.csproj": {
-                "projectPath": "D:\\hair-trigger-signalr-chat\\src\\HairTrigger.Chat.Infrastructure\\HairTrigger.Chat.Infrastructure.csproj"
+              "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Infrastructure/HairTrigger.Chat.Infrastructure.csproj": {
+                "projectPath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Infrastructure/HairTrigger.Chat.Infrastructure.csproj"
               }
             }
           }
@@ -103,7 +101,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.104/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.AspNetCore": "(,10.0.32767]",
             "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",
@@ -521,24 +519,22 @@
         }
       }
     },
-    "D:\\hair-trigger-signalr-chat\\src\\HairTrigger.Chat.Domain\\HairTrigger.Chat.Domain.csproj": {
+    "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Domain/HairTrigger.Chat.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\hair-trigger-signalr-chat\\src\\HairTrigger.Chat.Domain\\HairTrigger.Chat.Domain.csproj",
+        "projectUniqueName": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Domain/HairTrigger.Chat.Domain.csproj",
         "projectName": "HairTrigger.Chat.Domain",
-        "projectPath": "D:\\hair-trigger-signalr-chat\\src\\HairTrigger.Chat.Domain\\HairTrigger.Chat.Domain.csproj",
-        "packagesPath": "C:\\Users\\narut\\.nuget\\packages\\",
-        "outputPath": "D:\\hair-trigger-signalr-chat\\src\\HairTrigger.Chat.Domain\\obj\\",
+        "projectPath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Domain/HairTrigger.Chat.Domain.csproj",
+        "packagesPath": "/home/fatih/.nuget/packages/",
+        "outputPath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Domain/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\narut\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/home/fatih/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -578,7 +574,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.104/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -856,32 +852,30 @@
         }
       }
     },
-    "D:\\hair-trigger-signalr-chat\\src\\HairTrigger.Chat.Infrastructure\\HairTrigger.Chat.Infrastructure.csproj": {
+    "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Infrastructure/HairTrigger.Chat.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\hair-trigger-signalr-chat\\src\\HairTrigger.Chat.Infrastructure\\HairTrigger.Chat.Infrastructure.csproj",
+        "projectUniqueName": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Infrastructure/HairTrigger.Chat.Infrastructure.csproj",
         "projectName": "HairTrigger.Chat.Infrastructure",
-        "projectPath": "D:\\hair-trigger-signalr-chat\\src\\HairTrigger.Chat.Infrastructure\\HairTrigger.Chat.Infrastructure.csproj",
-        "packagesPath": "C:\\Users\\narut\\.nuget\\packages\\",
-        "outputPath": "D:\\hair-trigger-signalr-chat\\src\\HairTrigger.Chat.Infrastructure\\obj\\",
+        "projectPath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Infrastructure/HairTrigger.Chat.Infrastructure.csproj",
+        "packagesPath": "/home/fatih/.nuget/packages/",
+        "outputPath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Infrastructure/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\narut\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/home/fatih/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "D:\\hair-trigger-signalr-chat\\src\\HairTrigger.Chat.Domain\\HairTrigger.Chat.Domain.csproj": {
-                "projectPath": "D:\\hair-trigger-signalr-chat\\src\\HairTrigger.Chat.Domain\\HairTrigger.Chat.Domain.csproj"
+              "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Domain/HairTrigger.Chat.Domain.csproj": {
+                "projectPath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Domain/HairTrigger.Chat.Domain.csproj"
               }
             }
           }
@@ -931,7 +925,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.104/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",

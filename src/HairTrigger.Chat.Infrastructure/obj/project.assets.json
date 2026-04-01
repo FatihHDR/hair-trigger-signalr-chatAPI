@@ -836,34 +836,32 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\narut\\.nuget\\packages\\": {}
+    "/home/fatih/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\hair-trigger-signalr-chat\\src\\HairTrigger.Chat.Infrastructure\\HairTrigger.Chat.Infrastructure.csproj",
+      "projectUniqueName": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Infrastructure/HairTrigger.Chat.Infrastructure.csproj",
       "projectName": "HairTrigger.Chat.Infrastructure",
-      "projectPath": "D:\\hair-trigger-signalr-chat\\src\\HairTrigger.Chat.Infrastructure\\HairTrigger.Chat.Infrastructure.csproj",
-      "packagesPath": "C:\\Users\\narut\\.nuget\\packages\\",
-      "outputPath": "D:\\hair-trigger-signalr-chat\\src\\HairTrigger.Chat.Infrastructure\\obj\\",
+      "projectPath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Infrastructure/HairTrigger.Chat.Infrastructure.csproj",
+      "packagesPath": "/home/fatih/.nuget/packages/",
+      "outputPath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Infrastructure/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\narut\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "/home/fatih/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net10.0": {
           "targetAlias": "net10.0",
           "projectReferences": {
-            "D:\\hair-trigger-signalr-chat\\src\\HairTrigger.Chat.Domain\\HairTrigger.Chat.Domain.csproj": {
-              "projectPath": "D:\\hair-trigger-signalr-chat\\src\\HairTrigger.Chat.Domain\\HairTrigger.Chat.Domain.csproj"
+            "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Domain/HairTrigger.Chat.Domain.csproj": {
+              "projectPath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Domain/HairTrigger.Chat.Domain.csproj"
             }
           }
         }
@@ -913,7 +911,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.104/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.CSharp": "(,4.7.32767]",
           "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -1190,13 +1188,5 @@
         }
       }
     }
-  },
-  "logs": [
-    {
-      "code": "NU1900",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Error occurred while getting package vulnerability data: There is not enough space on the disk. : 'C:\\Users\\narut\\AppData\\Local\\NuGet\\v3-cache\\670c1461c29885f9aa22c281d8b7da90845b38e4$ps_api.nuget.org_v3_index.json\\vuln_data_base.dat-new'."
-    }
-  ]
+  }
 }

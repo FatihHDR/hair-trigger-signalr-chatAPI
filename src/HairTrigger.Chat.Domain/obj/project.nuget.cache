@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "5k1wdAwOROw=",
+  "dgSpecHash": "pBOZAUgquN8=",
   "success": true,
-  "projectFilePath": "D:\\hair-trigger-signalr-chat\\src\\HairTrigger.Chat.Domain\\HairTrigger.Chat.Domain.csproj",
+  "projectFilePath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Domain/HairTrigger.Chat.Domain.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }
