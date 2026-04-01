@@ -2,8 +2,8 @@ namespace HairTrigger.Chat.Domain.Queue;
 
 public interface IMessageQueue
 {
-    Task EnqueueAsync<T>(T command, CancellationToken cancellationToken = default) where T : class;
-    Task<T?> DequeueAsync<T>(CancellationToken cancellationToken = default) where T : class;
+    Task EnqueueAsync<T>(T command, CancellationToken cancellationToken = default) where T : QueueCommand;
+    Task<QueueCommand?> DequeueAsync(CancellationToken cancellationToken = default);
     Task<long> GetQueueLengthAsync(CancellationToken cancellationToken = default);
 }
 

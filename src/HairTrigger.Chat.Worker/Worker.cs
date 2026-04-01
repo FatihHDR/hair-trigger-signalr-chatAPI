@@ -1,9 +1,8 @@
-using System.Text.Json;
+using HairTrigger.Chat.Api.Hubs;
 using HairTrigger.Chat.Domain.Entities;
 using HairTrigger.Chat.Domain.Interfaces;
 using HairTrigger.Chat.Domain.Queue;
 using Microsoft.AspNetCore.SignalR;
-using StackExchange.Redis;
 
 namespace HairTrigger.Chat.Worker;
 
@@ -12,18 +11,18 @@ public class Worker : BackgroundService
     private readonly ILogger<Worker> _logger;
     private readonly IServiceProvider _serviceProvider;
     private readonly IMessageQueue _messageQueue;
-    private readonly IConnectionMultiplexer? _redis;
+    private readonly IHubContext<ChatHub> _hubContext;
 
     public Worker(
         ILogger<Worker> logger,
         IServiceProvider serviceProvider,
         IMessageQueue messageQueue,
-        IConnectionMultiplexer? redis = null)
+        IHubContext<ChatHub> hubContext)
     {
         _logger = logger;
         _serviceProvider = serviceProvider;
         _messageQueue = messageQueue;
-        _redis = redis;
+        _hubContext = hubContext;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -34,19 +33,23 @@ public class Worker : BackgroundService
         {
             try
             {
-                // Process SendMessageCommand
-                var sendMessageCmd = await _messageQueue.DequeueAsync<SendMessageCommand>(stoppingToken);
-                if (sendMessageCmd != null)
+                var command = await _messageQueue.DequeueAsync(stoppingToken);
+                if (command != null)
                 {
-                    await ProcessSendMessageAsync(sendMessageCmd, stoppingToken);
-                    continue;
-                }
+                    switch (command)
+                    {
+                        case SendMessageCommand sendMessageCmd:
+                            await ProcessSendMessageAsync(sendMessageCmd, stoppingToken);
+                            break;
+                        case MarkSeenCommand markSeenCmd:
+                            await ProcessMarkSeenAsync(markSeenCmd, stoppingToken);
+                            break;
+                        case UserConnectedCommand:
+                        case UserDisconnectedCommand:
+                            // Reserved for presence tracking.
+                            break;
+                    }
 
-                // Process MarkSeenCommand
-                var markSeenCmd = await _messageQueue.DequeueAsync<MarkSeenCommand>(stoppingToken);
-                if (markSeenCmd != null)
-                {
-                    await ProcessMarkSeenAsync(markSeenCmd, stoppingToken);
                     continue;
                 }
 
@@ -147,20 +150,6 @@ public class Worker : BackgroundService
 
     private async Task BroadcastToChannelAsync(Guid channelId, string method, object data)
     {
-        if (_redis == null)
-        {
-            _logger.LogWarning("Redis not available, cannot broadcast to channel {ChannelId}", channelId);
-            return;
-        }
-
-        var subscriber = _redis.GetSubscriber();
-        var payload = JsonSerializer.Serialize(new
-        {
-            Target = method,
-            Arguments = new[] { data }
-        });
-
-        // Publish to SignalR Redis backplane channel
-        await subscriber.PublishAsync($"HairTriggerChat:channel:{channelId}", payload);
+        await _hubContext.Clients.Group($"channel:{channelId}").SendAsync(method, data);
     }
 }

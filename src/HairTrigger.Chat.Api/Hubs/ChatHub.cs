@@ -1,10 +1,12 @@
 using HairTrigger.Chat.Domain.Queue;
 using HairTrigger.Chat.Domain.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
 
 namespace HairTrigger.Chat.Api.Hubs;
 
+[Authorize]
 public class ChatHub : Hub
 {
     private readonly IMessageQueue _messageQueue;
@@ -149,7 +151,6 @@ public class ChatHub : Hub
 
     private Guid GetUserId()
     {
-        // Try to get user ID from claims (when authenticated)
         var userIdClaim = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value
                           ?? Context.User?.FindFirst("sub")?.Value;
         
@@ -158,17 +159,6 @@ public class ChatHub : Hub
             return userId;
         }
 
-        // For development/testing: use a query parameter or header
-        var httpContext = Context.GetHttpContext();
-        var queryUserId = httpContext?.Request.Query["userId"].FirstOrDefault();
-        
-        if (Guid.TryParse(queryUserId, out var queryGuid))
-        {
-            return queryGuid;
-        }
-
-        // Fallback: generate a temporary ID (not recommended for production)
-        _logger.LogWarning("No user ID found in claims, generating temporary ID for connection {ConnectionId}", Context.ConnectionId);
-        return Guid.NewGuid();
+        throw new HubException("Unauthorized: user identifier claim is missing or invalid");
     }
 }

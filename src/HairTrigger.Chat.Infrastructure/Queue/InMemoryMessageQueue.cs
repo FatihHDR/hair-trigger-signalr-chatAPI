@@ -8,21 +8,22 @@ namespace HairTrigger.Chat.Infrastructure.Queue;
 /// </summary>
 public class InMemoryMessageQueue : IMessageQueue
 {
-    private readonly ConcurrentQueue<object> _queue = new();
+    private readonly ConcurrentQueue<QueueCommand> _queue = new();
 
-    public Task EnqueueAsync<T>(T command, CancellationToken cancellationToken = default) where T : class
+    public Task EnqueueAsync<T>(T command, CancellationToken cancellationToken = default) where T : QueueCommand
     {
         _queue.Enqueue(command);
         return Task.CompletedTask;
     }
 
-    public Task<T?> DequeueAsync<T>(CancellationToken cancellationToken = default) where T : class
+    public Task<QueueCommand?> DequeueAsync(CancellationToken cancellationToken = default)
     {
-        if (_queue.TryDequeue(out var item) && item is T typedItem)
+        if (_queue.TryDequeue(out var item))
         {
-            return Task.FromResult<T?>(typedItem);
+            return Task.FromResult<QueueCommand?>(item);
         }
-        return Task.FromResult<T?>(null);
+
+        return Task.FromResult<QueueCommand?>(null);
     }
 
     public Task<long> GetQueueLengthAsync(CancellationToken cancellationToken = default)

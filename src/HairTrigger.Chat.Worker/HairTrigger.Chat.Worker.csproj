@@ -8,13 +8,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="10.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.1" />
-    <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.10.0" />
+    <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.14.0" />
     <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.14.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\HairTrigger.Chat.Api\HairTrigger.Chat.Api.csproj" />
     <ProjectReference Include="..\HairTrigger.Chat.Domain\HairTrigger.Chat.Domain.csproj" />
     <ProjectReference Include="..\HairTrigger.Chat.Infrastructure\HairTrigger.Chat.Infrastructure.csproj" />
   </ItemGroup>
