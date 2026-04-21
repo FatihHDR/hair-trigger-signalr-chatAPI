@@ -15,107 +15,88 @@ public static class SeedData
 
         try
         {
-            await context.Database.MigrateAsync();
-
-            // Seed test users if none exist
-            if (!await context.Users.AnyAsync())
+            // Ensure the database exists and tables are accessible
+            // NOTE: Migrations are managed by backend-isj. This only seeds test data.
+            var canConnect = await context.Database.CanConnectAsync();
+            if (!canConnect)
             {
-                var users = new List<User>
-                {
-                    new()
-                    {
-                        Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-                        Username = "alice",
-                        DisplayName = "Alice Johnson",
-                        CreatedAt = DateTime.UtcNow
-                    },
-                    new()
-                    {
-                        Id = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                        Username = "bob",
-                        DisplayName = "Bob Smith",
-                        CreatedAt = DateTime.UtcNow
-                    },
-                    new()
-                    {
-                        Id = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                        Username = "charlie",
-                        DisplayName = "Charlie Brown",
-                        CreatedAt = DateTime.UtcNow
-                    }
-                };
-
-                context.Users.AddRange(users);
-                await context.SaveChangesAsync();
-                logger.LogInformation("Seeded {Count} test users", users.Count);
+                logger.LogWarning("Cannot connect to chat database. Ensure backend-isj has run migrations.");
+                return;
             }
 
-            // Seed test channels if none exist
-            if (!await context.Channels.AnyAsync())
+            // Seed test rooms if none exist
+            if (!await context.ChatRooms.AnyAsync())
             {
-                var channels = new List<Channel>
+                var rooms = new List<ChatRoom>
                 {
                     new()
                     {
                         Id = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
-                        Name = "general",
-                        Description = "General discussion channel",
-                        CreatedAt = DateTime.UtcNow,
-                        IsActive = true
+                        RoomType = ChatRoomType.Consultation,
+                        SessionReferenceId = null,
+                        IsActive = true,
+                        CreatedAt = DateTime.UtcNow
                     },
                     new()
                     {
                         Id = Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
-                        Name = "random",
-                        Description = "Random chat and fun stuff",
-                        CreatedAt = DateTime.UtcNow,
-                        IsActive = true
+                        RoomType = ChatRoomType.SupportGroup,
+                        SessionReferenceId = null,
+                        IsActive = true,
+                        CreatedAt = DateTime.UtcNow
                     },
                     new()
                     {
                         Id = Guid.Parse("cccccccc-cccc-cccc-cccc-cccccccccccc"),
-                        Name = "tech-talk",
-                        Description = "Technology discussions",
-                        CreatedAt = DateTime.UtcNow,
-                        IsActive = true
+                        RoomType = ChatRoomType.Emergency,
+                        SessionReferenceId = null,
+                        IsActive = true,
+                        CreatedAt = DateTime.UtcNow
                     }
                 };
 
-                context.Channels.AddRange(channels);
+                context.ChatRooms.AddRange(rooms);
                 await context.SaveChangesAsync();
-                logger.LogInformation("Seeded {Count} test channels", channels.Count);
+                logger.LogInformation("Seeded {Count} test chat rooms", rooms.Count);
             }
 
-            // Add all test users to all channels
-            if (!await context.ChannelMembers.AnyAsync())
+            // Seed test participants (using placeholder user reference IDs from primary DB)
+            if (!await context.ChatRoomParticipants.AnyAsync())
             {
-                var userIds = await context.Users.Select(u => u.Id).ToListAsync();
-                var channelIds = await context.Channels.Select(c => c.Id).ToListAsync();
-
-                var memberships = new List<ChannelMember>();
-                foreach (var channelId in channelIds)
+                var testUserIds = new[]
                 {
-                    foreach (var userId in userIds)
+                    Guid.Parse("11111111-1111-1111-1111-111111111111"),
+                    Guid.Parse("22222222-2222-2222-2222-222222222222"),
+                    Guid.Parse("33333333-3333-3333-3333-333333333333")
+                };
+
+                var roomIds = await context.ChatRooms.Select(r => r.Id).ToListAsync();
+                var participants = new List<ChatRoomParticipant>();
+
+                foreach (var roomId in roomIds)
+                {
+                    foreach (var userId in testUserIds)
                     {
-                        memberships.Add(new ChannelMember
+                        participants.Add(new ChatRoomParticipant
                         {
-                            ChannelId = channelId,
-                            UserId = userId,
+                            Id = Guid.NewGuid(),
+                            RoomId = roomId,
+                            UserReferenceId = userId,
+                            Role = "client",
                             JoinedAt = DateTime.UtcNow,
-                            Role = ChannelMemberRole.Member
+                            CreatedAt = DateTime.UtcNow
                         });
                     }
                 }
 
-                context.ChannelMembers.AddRange(memberships);
+                context.ChatRoomParticipants.AddRange(participants);
                 await context.SaveChangesAsync();
-                logger.LogInformation("Seeded {Count} channel memberships", memberships.Count);
+                logger.LogInformation("Seeded {Count} test participants", participants.Count);
             }
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "An error occurred while seeding the database");
-            throw;
+            logger.LogError(ex, "An error occurred while seeding the chat database");
         }
     }
 }

@@ -1,4 +1,3 @@
-using HairTrigger.Chat.Domain.Entities;
 using HairTrigger.Chat.Domain.Interfaces;
 using HairTrigger.Chat.Infrastructure.Data;
 using HairTrigger.Chat.Infrastructure.Repositories;
@@ -17,7 +16,7 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // Add DbContext with PostgreSQL
+        // Add DbContext with PostgreSQL — connects to existing chat_isj database
         services.AddDbContext<ChatDbContext>(options =>
             options.UseNpgsql(
                 configuration.GetConnectionString("ChatDatabase"),
@@ -47,10 +46,8 @@ public static class DependencyInjection
         }
 
         // Register repositories
-        services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<IChannelRepository, ChannelRepository>();
-        services.AddScoped<IMessageRepository, MessageRepository>();
-        services.AddScoped<IDeliveryStatusRepository, DeliveryStatusRepository>();
+        services.AddScoped<IChatRoomRepository, ChatRoomRepository>();
+        services.AddScoped<IChatMessageRepository, ChatMessageRepository>();
 
         return services;
     }

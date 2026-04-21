@@ -11,28 +11,21 @@ public interface IMessageQueue
 public abstract record QueueCommand(DateTime EnqueuedAt);
 
 public record SendMessageCommand(
-    Guid ChannelId,
-    Guid SenderId,
+    Guid RoomId,
+    Guid SenderReferenceId,
     string Content,
     string ConnectionId,
     DateTime EnqueuedAt
 ) : QueueCommand(EnqueuedAt);
 
-public record MarkSeenCommand(
-    Guid ChannelId,
-    Guid UserId,
-    long LastSeenOffset,
-    DateTime EnqueuedAt
-) : QueueCommand(EnqueuedAt);
-
 public record UserConnectedCommand(
-    Guid UserId,
+    Guid UserReferenceId,
     string ConnectionId,
     DateTime EnqueuedAt
 ) : QueueCommand(EnqueuedAt);
 
 public record UserDisconnectedCommand(
-    Guid UserId,
+    Guid UserReferenceId,
     string ConnectionId,
     DateTime EnqueuedAt
 ) : QueueCommand(EnqueuedAt);

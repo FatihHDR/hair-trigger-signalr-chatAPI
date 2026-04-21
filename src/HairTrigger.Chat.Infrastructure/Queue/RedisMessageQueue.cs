@@ -22,7 +22,6 @@ public class RedisMessageQueue : IMessageQueue
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         });
         
-        // Use type name as wrapper for deserialization
         var wrapper = new QueueMessageWrapper
         {
             TypeName = typeof(T).Name,
@@ -53,7 +52,6 @@ public class RedisMessageQueue : IMessageQueue
         return wrapper.TypeName switch
         {
             nameof(SendMessageCommand) => JsonSerializer.Deserialize<SendMessageCommand>(wrapper.Payload, options),
-            nameof(MarkSeenCommand) => JsonSerializer.Deserialize<MarkSeenCommand>(wrapper.Payload, options),
             nameof(UserConnectedCommand) => JsonSerializer.Deserialize<UserConnectedCommand>(wrapper.Payload, options),
             nameof(UserDisconnectedCommand) => JsonSerializer.Deserialize<UserDisconnectedCommand>(wrapper.Payload, options),
             _ => null
