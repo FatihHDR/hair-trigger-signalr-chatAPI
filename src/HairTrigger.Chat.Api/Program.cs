@@ -26,17 +26,17 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Add JWT authentication
+// Add JWT authentication (validates tokens issued by backend-isj)
 var jwtSection = builder.Configuration.GetSection("Jwt");
-var jwtIssuer = jwtSection["Issuer"] ?? "HairTrigger.Chat";
-var jwtAudience = jwtSection["Audience"] ?? "HairTrigger.Chat.Client";
+var jwtIssuer = jwtSection["Issuer"] ?? "backend-isj";
+var jwtAudience = jwtSection["Audience"] ?? "isj-client";
 var jwtSigningKey = jwtSection["Key"];
 
 if (string.IsNullOrWhiteSpace(jwtSigningKey))
 {
     if (builder.Environment.IsDevelopment())
     {
-        jwtSigningKey = "dev-only-signing-key-change-me-before-production-2026";
+        jwtSigningKey = "dev-only-signing-key-isj-change-me-before-production-2026";
     }
     else
     {
@@ -60,6 +60,7 @@ builder.Services
             ClockSkew = TimeSpan.FromSeconds(30)
         };
 
+        // Allow SignalR hub to receive token from query string
         options.Events = new JwtBearerEvents
         {
             OnMessageReceived = context =>
@@ -87,7 +88,7 @@ if (!string.IsNullOrEmpty(redisConnection))
 {
     signalRBuilder.AddStackExchangeRedis(redisConnection, options =>
     {
-        options.Configuration.ChannelPrefix = "HairTriggerChat";
+        options.Configuration.ChannelPrefix = "ISJChat";
     });
 }
 
@@ -110,14 +111,14 @@ builder.Services.AddSwaggerGen(options =>
     options.SwaggerDoc("v1", new OpenApiInfo
     {
         Version = "v1",
-        Title = "HairTrigger Chat API v1",
-        Description = "Real-time chat API with SignalR hub support."
+        Title = "ISJ Chat API v1",
+        Description = "Real-time chat API with SignalR hub for Indonesia Sehat Jiwa platform."
     });
 });
 
 var app = builder.Build();
 
-// Seed database with test data
+// Seed database with test data (only in development)
 if (app.Environment.IsDevelopment())
 {
     await HairTrigger.Chat.Infrastructure.Data.SeedData.SeedAsync(app.Services);
@@ -129,7 +130,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "HairTrigger Chat API v1");
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "ISJ Chat API v1");
         options.RoutePrefix = string.Empty; // Serve Swagger UI at root
     });
 }

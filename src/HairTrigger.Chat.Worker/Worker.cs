@@ -27,7 +27,7 @@ public class Worker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("HairTrigger Chat Worker started at: {time}", DateTimeOffset.Now);
+        _logger.LogInformation("ISJ Chat Worker started at: {time}", DateTimeOffset.Now);
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -40,9 +40,6 @@ public class Worker : BackgroundService
                     {
                         case SendMessageCommand sendMessageCmd:
                             await ProcessSendMessageAsync(sendMessageCmd, stoppingToken);
-                            break;
-                        case MarkSeenCommand markSeenCmd:
-                            await ProcessMarkSeenAsync(markSeenCmd, stoppingToken);
                             break;
                         case UserConnectedCommand:
                         case UserDisconnectedCommand:
@@ -67,89 +64,51 @@ public class Worker : BackgroundService
             }
         }
 
-        _logger.LogInformation("HairTrigger Chat Worker stopped at: {time}", DateTimeOffset.Now);
+        _logger.LogInformation("ISJ Chat Worker stopped at: {time}", DateTimeOffset.Now);
     }
 
     private async Task ProcessSendMessageAsync(SendMessageCommand command, CancellationToken cancellationToken)
     {
         using var scope = _serviceProvider.CreateScope();
-        var messageRepository = scope.ServiceProvider.GetRequiredService<IMessageRepository>();
-        var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+        var chatMessageRepository = scope.ServiceProvider.GetRequiredService<IChatMessageRepository>();
 
         try
         {
-            // Get next offset for channel
-            var offset = await messageRepository.GetNextOffsetAsync(command.ChannelId);
-
             // Create and persist message
-            var message = new Message
+            var message = new ChatMessage
             {
                 Id = Guid.NewGuid(),
-                ChannelId = command.ChannelId,
-                SenderId = command.SenderId,
+                RoomId = command.RoomId,
+                SenderReferenceId = command.SenderReferenceId,
+                MessageType = MessageType.Text,
                 Content = command.Content,
-                Offset = offset,
-                CreatedAt = DateTime.UtcNow,
-                IsDeleted = false
+                IsDeleted = false,
+                CreatedAt = DateTime.UtcNow
             };
 
-            await messageRepository.AddMessageAsync(message);
+            await chatMessageRepository.AddMessageAsync(message);
 
-            // Get sender info
-            var sender = await userRepository.GetByIdAsync(command.SenderId);
-
-            // Broadcast to channel via Redis pub/sub
-            await BroadcastToChannelAsync(command.ChannelId, "ReceiveMessage", new
+            // Broadcast to room via Redis pub/sub
+            await BroadcastToRoomAsync(command.RoomId, "ReceiveMessage", new
             {
                 message.Id,
-                message.ChannelId,
-                message.SenderId,
-                SenderName = sender?.DisplayName ?? "Unknown",
+                message.RoomId,
+                message.SenderReferenceId,
+                MessageType = message.MessageType.ToString(),
                 message.Content,
-                message.Offset,
                 message.CreatedAt
             });
 
-            _logger.LogDebug("Message {MessageId} persisted and broadcast to channel {ChannelId}", message.Id, command.ChannelId);
+            _logger.LogDebug("Message {MessageId} persisted and broadcast to room {RoomId}", message.Id, command.RoomId);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to process SendMessageCommand for channel {ChannelId}", command.ChannelId);
+            _logger.LogError(ex, "Failed to process SendMessageCommand for room {RoomId}", command.RoomId);
         }
     }
 
-    private async Task ProcessMarkSeenAsync(MarkSeenCommand command, CancellationToken cancellationToken)
+    private async Task BroadcastToRoomAsync(Guid roomId, string method, object data)
     {
-        using var scope = _serviceProvider.CreateScope();
-        var deliveryStatusRepository = scope.ServiceProvider.GetRequiredService<IDeliveryStatusRepository>();
-
-        try
-        {
-            await deliveryStatusRepository.MarkSeenUpToOffsetAsync(
-                command.UserId,
-                command.ChannelId,
-                command.LastSeenOffset);
-
-            // Broadcast read receipt to channel
-            await BroadcastToChannelAsync(command.ChannelId, "MessageSeen", new
-            {
-                command.UserId,
-                command.ChannelId,
-                command.LastSeenOffset,
-                SeenAt = DateTime.UtcNow
-            });
-
-            _logger.LogDebug("Mark seen processed for user {UserId} in channel {ChannelId} up to offset {Offset}",
-                command.UserId, command.ChannelId, command.LastSeenOffset);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to process MarkSeenCommand for user {UserId}", command.UserId);
-        }
-    }
-
-    private async Task BroadcastToChannelAsync(Guid channelId, string method, object data)
-    {
-        await _hubContext.Clients.Group($"channel:{channelId}").SendAsync(method, data);
+        await _hubContext.Clients.Group($"room:{roomId}").SendAsync(method, data);
     }
 }

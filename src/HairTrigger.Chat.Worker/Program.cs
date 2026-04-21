@@ -16,7 +16,7 @@ if (!string.IsNullOrEmpty(redisConnection))
 {
     signalRBuilder.AddStackExchangeRedis(redisConnection, options =>
     {
-        options.Configuration.ChannelPrefix = "HairTriggerChat";
+        options.Configuration.ChannelPrefix = "ISJChat";
     });
 }
 
