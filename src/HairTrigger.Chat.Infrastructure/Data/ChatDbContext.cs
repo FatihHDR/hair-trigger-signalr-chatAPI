@@ -21,38 +21,22 @@ public class ChatDbContext : DbContext
 
         // Enum value converters (store as lowercase strings to match backend-isj)
         var chatRoomTypeConverter = new ValueConverter<ChatRoomType, string>(
-            v => v switch
-            {
-                ChatRoomType.Consultation => "consultation",
-                ChatRoomType.SupportGroup => "support_group",
-                ChatRoomType.Emergency => "emergency",
-                _ => "consultation"
-            },
-            v => v switch
-            {
-                "consultation" => ChatRoomType.Consultation,
-                "support_group" => ChatRoomType.SupportGroup,
-                "emergency" => ChatRoomType.Emergency,
-                _ => ChatRoomType.Consultation
-            });
+            v => v == ChatRoomType.SupportGroup ? "support_group"
+               : v == ChatRoomType.Emergency ? "emergency"
+               : "consultation",
+            v => v == "support_group" ? ChatRoomType.SupportGroup
+               : v == "emergency" ? ChatRoomType.Emergency
+               : ChatRoomType.Consultation);
 
         var messageTypeConverter = new ValueConverter<MessageType, string>(
-            v => v switch
-            {
-                MessageType.Text => "text",
-                MessageType.Image => "image",
-                MessageType.File => "file",
-                MessageType.System => "system",
-                _ => "text"
-            },
-            v => v switch
-            {
-                "text" => MessageType.Text,
-                "image" => MessageType.Image,
-                "file" => MessageType.File,
-                "system" => MessageType.System,
-                _ => MessageType.Text
-            });
+            v => v == MessageType.Image ? "image"
+               : v == MessageType.File ? "file"
+               : v == MessageType.System ? "system"
+               : "text",
+            v => v == "image" ? MessageType.Image
+               : v == "file" ? MessageType.File
+               : v == "system" ? MessageType.System
+               : MessageType.Text);
 
         // ChatRoom → chat_rooms
         modelBuilder.Entity<ChatRoom>(entity =>
