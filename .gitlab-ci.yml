@@ -51,7 +51,6 @@ deploy-production:
     - echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
   script:
-    # Sync konfigurasi ke server jika menggunakan file .env
     - cat "$PRODUCTION_ENV" | ssh $SSH_USER@$SSH_HOST "mkdir -p /opt/chat-api/production && cat > /opt/chat-api/production/.env"
     - |
       ssh $SSH_USER@$SSH_HOST "
@@ -90,7 +89,6 @@ deploy-dev:
     - echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
   script:
-    # Sync konfigurasi ke server jika menggunakan file .env
     - cat "$DEV_ENV" | ssh $SSH_USER@$SSH_HOST "mkdir -p /opt/chat-api/dev && cat > /opt/chat-api/dev/.env"
     - |
       ssh $SSH_USER@$SSH_HOST "

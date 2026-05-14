@@ -431,3 +431,7 @@ logs/
 
 # Redis dump
 dump.rdb
+
+.env
+.env.development
+.env.production
