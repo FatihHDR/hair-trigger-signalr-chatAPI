@@ -1,49 +1,116 @@
-# This file is a template, and might need editing before it works on your project.
-# This is a sample GitLab CI/CD configuration file that should run without any modifications.
-# It demonstrates a basic 3 stage CI/CD pipeline. Instead of real tests or scripts,
-# it uses echo commands to simulate the pipeline execution.
-#
-# A pipeline is composed of independent jobs that run scripts, grouped into stages.
-# Stages run in sequential order, but jobs within stages run in parallel.
-#
-# For more information, see: https://docs.gitlab.com/ee/ci/yaml/#stages
-#
-# You can copy and paste this template into a new `.gitlab-ci.yml` file.
-# You should not add this template to an existing `.gitlab-ci.yml` file by using the `include:` keyword.
-#
-# To contribute improvements to CI/CD templates, please follow the Development guide at:
-# https://docs.gitlab.com/development/cicd/templates/
-# This specific template is located at:
-# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml
-
-stages:          # List of stages for jobs, and their order of execution
+stages:
   - build
-  - test
   - deploy
 
-build-job:       # This job runs in the build stage, which runs first.
+variables:
+  IMAGE_NAME: $CI_REGISTRY_IMAGE
+
+# ============================================================
+# BUILD - Docker image → GitLab Container Registry
+# ============================================================
+
+build-image:
   stage: build
+  image: docker:24-dind
+  services:
+    - docker:24-dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin
   script:
-    - echo "Compiling the code..."
-    - echo "Compile complete."
+    - |
+      if [ "$CI_COMMIT_BRANCH" = "main" ]; then
+        TAG="production"
+      elif [ "$CI_COMMIT_BRANCH" = "staging" ]; then
+        TAG="dev"
+      fi
+    - docker build -t $IMAGE_NAME:$TAG -t $IMAGE_NAME:$CI_COMMIT_SHORT_SHA -f dockerfile .
+    - docker push $IMAGE_NAME:$TAG
+    - docker push $IMAGE_NAME:$CI_COMMIT_SHORT_SHA
+  only:
+    - main
+    - staging
 
-unit-test-job:   # This job runs in the test stage.
-  stage: test    # It only starts when the job in the build stage completes successfully.
-  script:
-    - echo "Running unit tests... This will take about 60 seconds."
-    - sleep 60
-    - echo "Code coverage is 90%"
+# ============================================================
+# DEPLOY - SSH ke server, pull image, restart container
+# Server production & dev = 1 mesin (beda port & container)
+# ============================================================
 
-lint-test-job:   # This job also runs in the test stage.
-  stage: test    # It can run at the same time as unit-test-job (in parallel).
+deploy-production:
+  stage: deploy
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache openssh-client
+    - eval $(ssh-agent -s)
+    - echo "$SSH_KEY" | base64 -d > /tmp/deploy_key
+    - chmod 600 /tmp/deploy_key
+    - ssh-add /tmp/deploy_key
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
   script:
-    - echo "Linting code... This will take about 10 seconds."
-    - sleep 10
-    - echo "No lint issues found."
+    # Sync konfigurasi ke server jika menggunakan file .env
+    - cat "$PRODUCTION_ENV" | ssh $SSH_USER@$SSH_HOST "mkdir -p /opt/chat-api/production && cat > /opt/chat-api/production/.env"
+    - |
+      ssh $SSH_USER@$SSH_HOST "
+        echo '$CI_REGISTRY_PASSWORD' | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin &&
+        docker pull $IMAGE_NAME:production &&
+        docker stop chat-api-production || true &&
+        docker rm chat-api-production || true &&
+        docker run -d \
+          --name chat-api-production \
+          --restart unless-stopped \
+          --env-file /opt/chat-api/production/.env \
+          -e ASPNETCORE_ENVIRONMENT=Production \
+          -p 5001:8080 \
+          $IMAGE_NAME:production &&
+        docker network connect nginx_default chat-api-production || true &&
+        docker network connect redis-stack_default chat-api-production || true &&
+        docker network connect db_default chat-api-production || true &&
+        docker image prune -f
+      "
+  only:
+    - main
+  environment:
+    name: production
 
-deploy-job:      # This job runs in the deploy stage.
-  stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
-  environment: production
+deploy-dev:
+  stage: deploy
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache openssh-client
+    - eval $(ssh-agent -s)
+    - echo "$SSH_KEY" | base64 -d > /tmp/deploy_key
+    - chmod 600 /tmp/deploy_key
+    - ssh-add /tmp/deploy_key
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
   script:
-    - echo "Deploying application..."
-    - echo "Application successfully deployed."
+    # Sync konfigurasi ke server jika menggunakan file .env
+    - cat "$DEV_ENV" | ssh $SSH_USER@$SSH_HOST "mkdir -p /opt/chat-api/dev && cat > /opt/chat-api/dev/.env"
+    - |
+      ssh $SSH_USER@$SSH_HOST "
+        echo '$CI_REGISTRY_PASSWORD' | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin &&
+        docker pull $IMAGE_NAME:dev &&
+        docker stop chat-api-dev || true &&
+        docker rm chat-api-dev || true &&
+        docker run -d \
+          --name chat-api-dev \
+          --restart unless-stopped \
+          --env-file /opt/chat-api/dev/.env \
+          -e ASPNETCORE_ENVIRONMENT=Development \
+          -p 5002:8080 \
+          $IMAGE_NAME:dev &&
+        docker network connect nginx_default chat-api-dev || true &&
+        docker network connect redis-stack_default chat-api-dev || true &&
+        docker network connect db_default chat-api-dev || true &&
+        docker image prune -f
+      "
+  only:
+    - staging
+  environment:
+    name: dev
