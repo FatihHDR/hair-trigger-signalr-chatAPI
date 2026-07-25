@@ -6,14 +6,6 @@ namespace HairTrigger.Chat.Infrastructure.Data;
 
 public class ChatDbContext : DbContext
 {
-    static ChatDbContext()
-    {
-        // For Npgsql 7.0+, enum mapping can be done globally or per data source.
-        // We'll map it globally for simplicity.
-        NpgsqlConnection.GlobalTypeMapper.MapEnum<ChatRoomType>("public.chat_rooms_room_type_enum");
-        NpgsqlConnection.GlobalTypeMapper.MapEnum<MessageType>("public.chat_messages_message_type_enum");
-    }
-
     public ChatDbContext(DbContextOptions<ChatDbContext> options) : base(options)
     {
     }

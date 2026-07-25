@@ -1,3 +1,4 @@
+using HairTrigger.Chat.Domain.Entities;
 using HairTrigger.Chat.Domain.Interfaces;
 using HairTrigger.Chat.Infrastructure.Data;
 using HairTrigger.Chat.Infrastructure.Repositories;
@@ -6,6 +7,7 @@ using HairTrigger.Chat.Domain.Queue;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using StackExchange.Redis;
 
 namespace HairTrigger.Chat.Infrastructure;
@@ -16,10 +18,18 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        var connectionString = configuration.GetConnectionString("ChatDatabase");
+        var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+        dataSourceBuilder.MapEnum<ChatRoomType>("public.chat_rooms_room_type_enum");
+        dataSourceBuilder.MapEnum<MessageType>("public.chat_messages_message_type_enum");
+        var dataSource = dataSourceBuilder.Build();
+
+        services.AddSingleton(dataSource);
+
         // Add DbContext with PostgreSQL — connects to existing chat_isj database
         services.AddDbContext<ChatDbContext>(options =>
             options.UseNpgsql(
-                configuration.GetConnectionString("ChatDatabase"),
+                dataSource,
                 npgsqlOptions => npgsqlOptions.EnableRetryOnFailure(
                     maxRetryCount: 3,
                     maxRetryDelay: TimeSpan.FromSeconds(5),
