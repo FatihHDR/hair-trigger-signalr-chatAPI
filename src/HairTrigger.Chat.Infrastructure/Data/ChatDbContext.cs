@@ -30,8 +30,7 @@ public class ChatDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.RoomType)
-                .HasColumnName("room_type")
-                .HasColumnType("chat_rooms_room_type_enum");
+                .HasColumnName("room_type");
             entity.Property(e => e.SessionReferenceId).HasColumnName("session_reference_id");
             entity.Property(e => e.IsActive).HasColumnName("is_active");
             entity.Property(e => e.ClosedAt).HasColumnName("closed_at");
@@ -68,8 +67,7 @@ public class ChatDbContext : DbContext
             entity.Property(e => e.RoomId).HasColumnName("room_id");
             entity.Property(e => e.SenderReferenceId).HasColumnName("sender_reference_id");
             entity.Property(e => e.MessageType)
-                .HasColumnName("message_type")
-                .HasColumnType("chat_messages_message_type_enum");
+                .HasColumnName("message_type");
             entity.Property(e => e.Content).HasColumnName("content");
             entity.Property(e => e.IsDeleted).HasColumnName("is_deleted");
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
