@@ -68,7 +68,6 @@ deploy-production:
           $IMAGE_NAME:production &&
         docker network connect nginx_default chat-api-production || true &&
         docker network connect redis-stack_default chat-api-production || true &&
-        docker network connect db_default chat-api-production || true &&
         docker image prune -f
       "
   only:
@@ -107,7 +106,6 @@ deploy-dev:
           $IMAGE_NAME:dev &&
         docker network connect nginx_default chat-api-dev || true &&
         docker network connect redis-stack_default chat-api-dev || true &&
-        docker network connect db_default chat-api-dev || true &&
         docker image prune -f
       "
   only:
