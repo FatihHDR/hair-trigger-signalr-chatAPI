@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "PDohdz3A9Yc=",
+  "dgSpecHash": "tdfuyyVunEs=",
   "success": true,
   "projectFilePath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Api/HairTrigger.Chat.Api.csproj",
   "expectedPackageFiles": [
@@ -70,5 +70,150 @@
     "/home/fatih/.nuget/packages/system.security.permissions/9.0.0/system.security.permissions.9.0.0.nupkg.sha512",
     "/home/fatih/.nuget/packages/system.windows.extensions/9.0.0/system.windows.extensions.9.0.0.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "NU1902",
+      "level": "Warning",
+      "message": "Package 'MessagePack' 2.5.187 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-2f33-pr97-265q",
+      "projectPath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Api/HairTrigger.Chat.Api.csproj",
+      "warningLevel": 1,
+      "filePath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Api/HairTrigger.Chat.Api.csproj",
+      "libraryId": "MessagePack",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
+    {
+      "code": "NU1902",
+      "level": "Warning",
+      "message": "Package 'MessagePack' 2.5.187 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-2x83-8g95-xh59",
+      "projectPath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Api/HairTrigger.Chat.Api.csproj",
+      "warningLevel": 1,
+      "filePath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Api/HairTrigger.Chat.Api.csproj",
+      "libraryId": "MessagePack",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
+    {
+      "code": "NU1902",
+      "level": "Warning",
+      "message": "Package 'MessagePack' 2.5.187 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-cj9g-3mj2-g8vv",
+      "projectPath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Api/HairTrigger.Chat.Api.csproj",
+      "warningLevel": 1,
+      "filePath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Api/HairTrigger.Chat.Api.csproj",
+      "libraryId": "MessagePack",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
+    {
+      "code": "NU1902",
+      "level": "Warning",
+      "message": "Package 'MessagePack' 2.5.187 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-cxmj-83gh-fp49",
+      "projectPath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Api/HairTrigger.Chat.Api.csproj",
+      "warningLevel": 1,
+      "filePath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Api/HairTrigger.Chat.Api.csproj",
+      "libraryId": "MessagePack",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "message": "Package 'MessagePack' 2.5.187 has a known high severity vulnerability, https://github.com/advisories/GHSA-hv8m-jj95-wg3x",
+      "projectPath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Api/HairTrigger.Chat.Api.csproj",
+      "warningLevel": 1,
+      "filePath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Api/HairTrigger.Chat.Api.csproj",
+      "libraryId": "MessagePack",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
+    {
+      "code": "NU1902",
+      "level": "Warning",
+      "message": "Package 'MessagePack' 2.5.187 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-q2h6-ghwm-5qm8",
+      "projectPath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Api/HairTrigger.Chat.Api.csproj",
+      "warningLevel": 1,
+      "filePath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Api/HairTrigger.Chat.Api.csproj",
+      "libraryId": "MessagePack",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
+    {
+      "code": "NU1902",
+      "level": "Warning",
+      "message": "Package 'MessagePack' 2.5.187 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhmf-xw27-6rqr",
+      "projectPath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Api/HairTrigger.Chat.Api.csproj",
+      "warningLevel": 1,
+      "filePath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Api/HairTrigger.Chat.Api.csproj",
+      "libraryId": "MessagePack",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
+    {
+      "code": "NU1902",
+      "level": "Warning",
+      "message": "Package 'MessagePack' 2.5.187 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-v72x-2h86-7f8m",
+      "projectPath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Api/HairTrigger.Chat.Api.csproj",
+      "warningLevel": 1,
+      "filePath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Api/HairTrigger.Chat.Api.csproj",
+      "libraryId": "MessagePack",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "message": "Package 'MessagePack' 2.5.187 has a known high severity vulnerability, https://github.com/advisories/GHSA-vh6j-jc39-fggf",
+      "projectPath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Api/HairTrigger.Chat.Api.csproj",
+      "warningLevel": 1,
+      "filePath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Api/HairTrigger.Chat.Api.csproj",
+      "libraryId": "MessagePack",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
+    {
+      "code": "NU1902",
+      "level": "Warning",
+      "message": "Package 'MessagePack' 2.5.187 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w567-gjr2-hm5j",
+      "projectPath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Api/HairTrigger.Chat.Api.csproj",
+      "warningLevel": 1,
+      "filePath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Api/HairTrigger.Chat.Api.csproj",
+      "libraryId": "MessagePack",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
+    {
+      "code": "NU1902",
+      "level": "Warning",
+      "message": "Package 'MessagePack' 2.5.187 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-wfr3-xj75-pfwh",
+      "projectPath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Api/HairTrigger.Chat.Api.csproj",
+      "warningLevel": 1,
+      "filePath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Api/HairTrigger.Chat.Api.csproj",
+      "libraryId": "MessagePack",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
+    {
+      "code": "NU1902",
+      "level": "Warning",
+      "message": "Package 'OpenTelemetry.Api' 1.14.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-g94r-2vxg-569j",
+      "projectPath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Api/HairTrigger.Chat.Api.csproj",
+      "warningLevel": 1,
+      "filePath": "/home/fatih/Documents/Projects/isj-dev/hair-trigger-signalr-chatAPI/src/HairTrigger.Chat.Api/HairTrigger.Chat.Api.csproj",
+      "libraryId": "OpenTelemetry.Api",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    }
+  ]
 }

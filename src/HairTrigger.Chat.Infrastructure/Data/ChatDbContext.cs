@@ -1,11 +1,19 @@
 using HairTrigger.Chat.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql;
 
 namespace HairTrigger.Chat.Infrastructure.Data;
 
 public class ChatDbContext : DbContext
 {
+    static ChatDbContext()
+    {
+        // For Npgsql 7.0+, enum mapping can be done globally or per data source.
+        // We'll map it globally for simplicity.
+        NpgsqlConnection.GlobalTypeMapper.MapEnum<ChatRoomType>("public.chat_rooms_room_type_enum");
+        NpgsqlConnection.GlobalTypeMapper.MapEnum<MessageType>("public.chat_messages_message_type_enum");
+    }
+
     public ChatDbContext(DbContextOptions<ChatDbContext> options) : base(options)
     {
     }
@@ -19,24 +27,9 @@ public class ChatDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Enum value converters (store as lowercase strings to match backend-isj)
-        var chatRoomTypeConverter = new ValueConverter<ChatRoomType, string>(
-            v => v == ChatRoomType.SupportGroup ? "support_group"
-               : v == ChatRoomType.Emergency ? "emergency"
-               : "consultation",
-            v => v == "support_group" ? ChatRoomType.SupportGroup
-               : v == "emergency" ? ChatRoomType.Emergency
-               : ChatRoomType.Consultation);
-
-        var messageTypeConverter = new ValueConverter<MessageType, string>(
-            v => v == MessageType.Image ? "image"
-               : v == MessageType.File ? "file"
-               : v == MessageType.System ? "system"
-               : "text",
-            v => v == "image" ? MessageType.Image
-               : v == "file" ? MessageType.File
-               : v == "system" ? MessageType.System
-               : MessageType.Text);
+        // Map PostgreSQL native enum types (created by backend-isj migrations)
+        modelBuilder.HasPostgresEnum<ChatRoomType>("public", "chat_rooms_room_type_enum");
+        modelBuilder.HasPostgresEnum<MessageType>("public", "chat_messages_message_type_enum");
 
         // ChatRoom → chat_rooms
         modelBuilder.Entity<ChatRoom>(entity =>
@@ -46,8 +39,7 @@ public class ChatDbContext : DbContext
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.RoomType)
                 .HasColumnName("room_type")
-                .HasConversion(chatRoomTypeConverter)
-                .HasMaxLength(50);
+                .HasColumnType("chat_rooms_room_type_enum");
             entity.Property(e => e.SessionReferenceId).HasColumnName("session_reference_id");
             entity.Property(e => e.IsActive).HasColumnName("is_active");
             entity.Property(e => e.ClosedAt).HasColumnName("closed_at");
@@ -85,8 +77,7 @@ public class ChatDbContext : DbContext
             entity.Property(e => e.SenderReferenceId).HasColumnName("sender_reference_id");
             entity.Property(e => e.MessageType)
                 .HasColumnName("message_type")
-                .HasConversion(messageTypeConverter)
-                .HasMaxLength(50);
+                .HasColumnType("chat_messages_message_type_enum");
             entity.Property(e => e.Content).HasColumnName("content");
             entity.Property(e => e.IsDeleted).HasColumnName("is_deleted");
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
