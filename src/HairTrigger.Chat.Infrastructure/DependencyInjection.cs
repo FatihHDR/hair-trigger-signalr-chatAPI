@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
+using Npgsql.NameTranslation;
 using StackExchange.Redis;
 
 namespace HairTrigger.Chat.Infrastructure;
@@ -20,8 +21,9 @@ public static class DependencyInjection
     {
         var connectionString = configuration.GetConnectionString("ChatDatabase");
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
-        dataSourceBuilder.MapEnum<ChatRoomType>("public.chat_rooms_room_type_enum");
-        dataSourceBuilder.MapEnum<MessageType>("public.chat_messages_message_type_enum");
+        var nameTranslator = new NpgsqlSnakeCaseNameTranslator();
+        dataSourceBuilder.MapEnum<ChatRoomType>("chat_rooms_room_type_enum", nameTranslator);
+        dataSourceBuilder.MapEnum<MessageType>("chat_messages_message_type_enum", nameTranslator);
         var dataSource = dataSourceBuilder.Build();
 
         services.AddSingleton(dataSource);
