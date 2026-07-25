@@ -22,8 +22,8 @@ public static class DependencyInjection
         var connectionString = configuration.GetConnectionString("ChatDatabase");
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
         var nameTranslator = new NpgsqlSnakeCaseNameTranslator();
-        dataSourceBuilder.MapEnum<ChatRoomType>("public.chat_rooms_room_type_enum", nameTranslator);
-        dataSourceBuilder.MapEnum<MessageType>("public.chat_messages_message_type_enum", nameTranslator);
+        dataSourceBuilder.MapEnum<ChatRoomType>("chat_rooms_room_type_enum", nameTranslator);
+        dataSourceBuilder.MapEnum<MessageType>("chat_messages_message_type_enum", nameTranslator);
         var dataSource = dataSourceBuilder.Build();
 
         services.AddSingleton(dataSource);

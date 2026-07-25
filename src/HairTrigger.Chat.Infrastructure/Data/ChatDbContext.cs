@@ -20,8 +20,8 @@ public class ChatDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         // Map PostgreSQL native enum types (created by backend-isj migrations)
-        modelBuilder.HasPostgresEnum<ChatRoomType>("public", "chat_rooms_room_type_enum");
-        modelBuilder.HasPostgresEnum<MessageType>("public", "chat_messages_message_type_enum");
+        modelBuilder.HasPostgresEnum<ChatRoomType>("chat_rooms_room_type_enum");
+        modelBuilder.HasPostgresEnum<MessageType>("chat_messages_message_type_enum");
 
         // ChatRoom → chat_rooms
         modelBuilder.Entity<ChatRoom>(entity =>
