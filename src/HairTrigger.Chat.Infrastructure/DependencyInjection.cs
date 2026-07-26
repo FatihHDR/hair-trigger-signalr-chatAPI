@@ -32,10 +32,15 @@ public static class DependencyInjection
         services.AddDbContext<ChatDbContext>(options =>
             options.UseNpgsql(
                 dataSource,
-                npgsqlOptions => npgsqlOptions.EnableRetryOnFailure(
-                    maxRetryCount: 3,
-                    maxRetryDelay: TimeSpan.FromSeconds(5),
-                    errorCodesToAdd: null)));
+                npgsqlOptions =>
+                {
+                    npgsqlOptions.MapEnum<ChatRoomType>("chat_rooms_room_type_enum", nameTranslator: nameTranslator);
+                    npgsqlOptions.MapEnum<MessageType>("chat_messages_message_type_enum", nameTranslator: nameTranslator);
+                    npgsqlOptions.EnableRetryOnFailure(
+                        maxRetryCount: 3,
+                        maxRetryDelay: TimeSpan.FromSeconds(5),
+                        errorCodesToAdd: null);
+                }));
 
         // Add Redis
         var redisConnectionString = configuration.GetConnectionString("Redis");
