@@ -1,9 +1,12 @@
+using System.Security.Claims;
 using HairTrigger.Chat.Domain.Entities;
 using HairTrigger.Chat.Domain.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HairTrigger.Chat.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/v1/rooms")]
 [Produces("application/json")]
@@ -54,12 +57,27 @@ public class RoomsController : ControllerBase
     }
 
     /// <summary>
-    /// Create a new chat room
+    /// Get rooms for the currently authenticated user
+    /// </summary>
+    [HttpGet("my-rooms")]
+    [ProducesResponseType(typeof(IEnumerable<ChatRoomDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<ChatRoomDto>>> GetMyRooms()
+    {
+        var userId = GetUserReferenceId();
+        var rooms = await _chatRoomRepository.GetUserRoomsAsync(userId);
+        return Ok(rooms.Select(ToDto));
+    }
+
+    /// <summary>
+    /// Create a new chat room (authenticated users only)
     /// </summary>
     [HttpPost]
     [ProducesResponseType(typeof(ChatRoomDto), StatusCodes.Status201Created)]
     public async Task<ActionResult<ChatRoomDto>> CreateRoom([FromBody] CreateRoomRequest request)
     {
+        var creatorUserId = GetUserReferenceId();
+        var creatorRole = GetUserPrimaryRole();
+
         var room = new ChatRoom
         {
             Id = Guid.NewGuid(),
@@ -70,6 +88,20 @@ public class RoomsController : ControllerBase
         };
 
         await _chatRoomRepository.CreateAsync(room);
+
+        // Auto add creator as participant using their primary role from backend-isj JWT
+        await _chatRoomRepository.AddParticipantAsync(room.Id, creatorUserId, creatorRole);
+
+        // If a target user is provided, add them as participant as well
+        if (request.TargetUserReferenceId.HasValue && request.TargetUserReferenceId.Value != creatorUserId)
+        {
+            var targetRole = !string.IsNullOrWhiteSpace(request.TargetUserRole) 
+                ? request.TargetUserRole.ToLowerInvariant() 
+                : UserRoles.Counselor;
+
+            await _chatRoomRepository.AddParticipantAsync(room.Id, request.TargetUserReferenceId.Value, targetRole);
+        }
+
         return CreatedAtAction(nameof(GetRoom), new { id = room.Id }, ToDto(room));
     }
 
@@ -101,7 +133,7 @@ public class RoomsController : ControllerBase
         if (room == null)
             return NotFound("Room not found");
 
-        var participant = await _chatRoomRepository.AddParticipantAsync(roomId, request.UserReferenceId, request.Role);
+        var participant = await _chatRoomRepository.AddParticipantAsync(roomId, request.UserReferenceId, request.Role.ToLowerInvariant());
         return Created("", ToParticipantDto(participant));
     }
 
@@ -132,6 +164,27 @@ public class RoomsController : ControllerBase
         return Ok(participants.Select(ToParticipantDto));
     }
 
+    private Guid GetUserReferenceId()
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                          ?? User.FindFirst("sub")?.Value;
+        
+        if (Guid.TryParse(userIdClaim, out var userId))
+        {
+            return userId;
+        }
+
+        throw new UnauthorizedAccessException("User identifier claim (sub) is missing or invalid in JWT token");
+    }
+
+    private string GetUserPrimaryRole()
+    {
+        var roleClaim = User.FindFirst(ClaimTypes.Role)?.Value
+                        ?? User.FindFirst("roles")?.Value;
+
+        return !string.IsNullOrWhiteSpace(roleClaim) ? roleClaim.ToLowerInvariant() : UserRoles.Client;
+    }
+
     private static ChatRoomDto ToDto(ChatRoom room) => 
         new(room.Id, room.RoomType.ToString(), room.SessionReferenceId, room.IsActive, room.ClosedAt, room.CreatedAt);
 
@@ -140,6 +193,7 @@ public class RoomsController : ControllerBase
 }
 
 public record ChatRoomDto(Guid Id, string RoomType, Guid? SessionReferenceId, bool IsActive, DateTime? ClosedAt, DateTime CreatedAt);
-public record CreateRoomRequest(ChatRoomType RoomType, Guid? SessionReferenceId);
+public record CreateRoomRequest(ChatRoomType RoomType, Guid? SessionReferenceId, Guid? TargetUserReferenceId = null, string? TargetUserRole = null);
 public record AddParticipantRequest(Guid UserReferenceId, string Role);
 public record ParticipantDto(Guid Id, Guid RoomId, Guid UserReferenceId, string Role, DateTime JoinedAt, DateTime? LeftAt);
+

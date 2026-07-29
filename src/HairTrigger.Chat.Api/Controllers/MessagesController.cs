@@ -1,9 +1,11 @@
 using HairTrigger.Chat.Domain.Entities;
 using HairTrigger.Chat.Domain.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HairTrigger.Chat.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/v1/messages")]
 [Produces("application/json")]
