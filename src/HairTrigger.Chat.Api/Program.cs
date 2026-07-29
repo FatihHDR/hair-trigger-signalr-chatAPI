@@ -43,8 +43,8 @@ builder.Services.AddCors(options =>
         .SetIsOriginAllowedToAllowWildcardSubdomains()
         .AllowAnyMethod()
         .AllowAnyHeader()
+        .WithExposedHeaders("x-signalr-user-agent")
         .AllowCredentials();
-        .WithExposedHeaders("x-signalr-user-agent");
     });
 });
 
