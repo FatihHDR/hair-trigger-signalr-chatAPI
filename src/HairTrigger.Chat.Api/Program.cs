@@ -15,32 +15,35 @@ builder.Services.AddInfrastructure(builder.Configuration);
 // Add CORS
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(policy =>
+    options.AddPolicy("AllowFrontend", policy =>
     {
-        var envOrigins = Environment.GetEnvironmentVariable("ALLOWED_ORIGINS");
-        string[] origins;
-
-        if (!string.IsNullOrWhiteSpace(envOrigins))
+        policy.SetIsOriginAllowed(origin =>
         {
-            origins = envOrigins.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        }
-        else
-        {
-            origins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() 
-                ?? new[] { 
-                    "https://isj.vyg.re", 
-                    "https://isj-dev.vyg.re", 
-                    "https://api-chat-isj.vyg.re", 
-                    "https://api-isj-dev.vyg.re", 
-                    "http://localhost:3000", 
-                    "http://localhost:5173" 
-                };
-        }
+            if (string.IsNullOrWhiteSpace(origin)) return false;
 
-        policy.WithOrigins(origins)
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials();
+            // Allow localhost on any port (3000, 5173, 4200, 3001, etc.)
+            if (origin.StartsWith("http://localhost:") || origin.StartsWith("https://localhost:") || origin == "http://localhost" || origin == "https://localhost")
+                return true;
+
+            // Allow all vyg.re subdomains (isj.vyg.re, isj-dev.vyg.re, etc.)
+            if (origin.EndsWith(".vyg.re") || origin == "https://vyg.re")
+                return true;
+
+            // Also check ALLOWED_ORIGINS env variable if configured
+            var envOrigins = Environment.GetEnvironmentVariable("ALLOWED_ORIGINS");
+            if (!string.IsNullOrWhiteSpace(envOrigins))
+            {
+                var allowed = envOrigins.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                if (allowed.Contains(origin, StringComparer.OrdinalIgnoreCase))
+                    return true;
+            }
+
+            return false;
+        })
+        .SetIsOriginAllowedToAllowWildcardSubdomains()
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials();
     });
 });
 
@@ -162,6 +165,8 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+app.UseCors("AllowFrontend");
+
 // Seed database with test data (only in development)
 if (app.Environment.IsDevelopment())
 {
@@ -180,8 +185,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-app.UseCors();
 
 app.UseAuthentication();
 
