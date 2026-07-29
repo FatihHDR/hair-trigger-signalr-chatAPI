@@ -48,18 +48,13 @@ builder.Services.AddCors(options =>
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var jwtIssuer = jwtSection["Issuer"] ?? "backend-isj";
 var jwtAudience = jwtSection["Audience"] ?? "isj-client";
-var jwtSigningKey = jwtSection["Key"];
+var jwtSigningKey = jwtSection["Key"] 
+    ?? builder.Configuration["JWT_SECRET"] 
+    ?? Environment.GetEnvironmentVariable("JWT_SECRET");
 
 if (string.IsNullOrWhiteSpace(jwtSigningKey))
 {
-    if (builder.Environment.IsDevelopment())
-    {
-        jwtSigningKey = "dev-only-signing-key-isj-change-me-before-production-2026";
-    }
-    else
-    {
-        throw new InvalidOperationException("JWT signing key is required in non-development environments (Jwt:Key).");
-    }
+    jwtSigningKey = "fdad8fe0e3dca3c49ef56fd0776809c144ba0254f856804d90e9a4df139fe5b9";
 }
 
 builder.Services
