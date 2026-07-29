@@ -17,9 +17,27 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins(
-                builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() 
-                ?? new[] { "http://localhost:3000", "http://localhost:5173" })
+        var envOrigins = Environment.GetEnvironmentVariable("ALLOWED_ORIGINS");
+        string[] origins;
+
+        if (!string.IsNullOrWhiteSpace(envOrigins))
+        {
+            origins = envOrigins.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        }
+        else
+        {
+            origins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() 
+                ?? new[] { 
+                    "https://isj.vyg.re", 
+                    "https://isj-dev.vyg.re", 
+                    "https://api-chat-isj.vyg.re", 
+                    "https://api-isj-dev.vyg.re", 
+                    "http://localhost:3000", 
+                    "http://localhost:5173" 
+                };
+        }
+
+        policy.WithOrigins(origins)
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
@@ -106,7 +124,11 @@ builder.Services.AddOpenTelemetry()
     });
 
 // Add controllers and OpenAPI/Swagger
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
