@@ -17,46 +17,34 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        var envOrigins = Environment.GetEnvironmentVariable("ALLOWED_ORIGINS");
-        var originsList = new List<string>
+        policy.SetIsOriginAllowed(origin =>
         {
-            "http://localhost:3000",
-            "http://localhost:5173",
-            "https://isj-dev.vyg.re",
-            "https://isj.vyg.re",
-            "https://api-chat-isj.vyg.re",
-            "https://api-isj-dev.vyg.re"
-        };
+            if (string.IsNullOrWhiteSpace(origin)) return false;
 
-        if (!string.IsNullOrWhiteSpace(envOrigins))
-        {
-            var parsed = envOrigins.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-            originsList.AddRange(parsed);
-        }
+            // Allow localhost on any port (3000, 5173, 4200, 3001, etc.)
+            if (origin.StartsWith("http://localhost:") || origin.StartsWith("https://localhost:") || origin == "http://localhost" || origin == "https://localhost")
+                return true;
 
-        var configOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
-        if (configOrigins != null)
-        {
-            originsList.AddRange(configOrigins);
-        }
+            // Allow all vyg.re subdomains (isj.vyg.re, isj-dev.vyg.re, etc.)
+            if (origin.EndsWith(".vyg.re") || origin == "https://vyg.re")
+                return true;
 
-        var originsArray = originsList.Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
+            // Also check ALLOWED_ORIGINS env variable if configured
+            var envOrigins = Environment.GetEnvironmentVariable("ALLOWED_ORIGINS");
+            if (!string.IsNullOrWhiteSpace(envOrigins))
+            {
+                var allowed = envOrigins.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                if (allowed.Contains(origin, StringComparer.OrdinalIgnoreCase))
+                    return true;
+            }
 
-        policy.WithOrigins(originsArray)
-              .SetIsOriginAllowed(origin =>
-              {
-                  if (string.IsNullOrWhiteSpace(origin)) return false;
-                  if (origin.StartsWith("http://localhost:") || origin.StartsWith("https://localhost:") || origin == "http://localhost" || origin == "https://localhost")
-                      return true;
-                  if (origin.EndsWith(".vyg.re") || origin == "https://vyg.re")
-                      return true;
-                  return originsArray.Contains(origin, StringComparer.OrdinalIgnoreCase);
-              })
-              .SetIsOriginAllowedToAllowWildcardSubdomains()
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .WithExposedHeaders("x-signalr-user-agent")
-              .AllowCredentials();
+            return false;
+        })
+        .SetIsOriginAllowedToAllowWildcardSubdomains()
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials();
+        .WithExposedHeaders("x-signalr-user-agent");
     });
 });
 
