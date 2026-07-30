@@ -1,16 +1,33 @@
+using HairTrigger.Chat.Api;
 using HairTrigger.Chat.Api.Hubs;
 using HairTrigger.Chat.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 using Microsoft.IdentityModel.Tokens;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using System.Net;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add Infrastructure services (DbContext, Redis, Repositories)
 builder.Services.AddInfrastructure(builder.Configuration);
+
+// Return structured JSON errors for all unhandled exceptions and HTTP error codes
+builder.Services.AddProblemDetails(options =>
+{
+    options.CustomizeProblemDetails = ctx =>
+    {
+        ctx.ProblemDetails.Instance = $"{ctx.HttpContext.Request.Method} {ctx.HttpContext.Request.Path}";
+        ctx.ProblemDetails.Extensions["requestId"] = ctx.HttpContext.TraceIdentifier;
+    };
+});
+
+// Global exception handler — catches unhandled exceptions and returns 500 JSON
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 // Add CORS
 builder.Services.AddCors(options =>
@@ -93,6 +110,49 @@ builder.Services
                 }
 
                 return Task.CompletedTask;
+            },
+
+            // Called when a request has no token or an invalid token — return 401 JSON
+            OnChallenge = async context =>
+            {
+                context.HandleResponse(); // suppress default empty-body 401
+
+                var detail = context.AuthenticateFailure?.Message
+                    ?? "Bearer token is missing or invalid.";
+
+                // Distinguish between missing token and invalid/expired token
+                if (context.AuthenticateFailure == null)
+                    detail = "Authorization header with a valid Bearer token is required.";
+
+                var problem = new ProblemDetails
+                {
+                    Status   = StatusCodes.Status401Unauthorized,
+                    Title    = "Unauthorized",
+                    Detail   = detail,
+                    Instance = $"{context.Request.Method} {context.Request.Path}",
+                };
+                problem.Extensions["requestId"] = context.HttpContext.TraceIdentifier;
+
+                context.Response.StatusCode  = StatusCodes.Status401Unauthorized;
+                context.Response.ContentType = "application/problem+json";
+                await context.Response.WriteAsJsonAsync(problem);
+            },
+
+            // Called when a valid token doesn't have the required role/policy — return 403 JSON
+            OnForbidden = async context =>
+            {
+                var problem = new ProblemDetails
+                {
+                    Status   = StatusCodes.Status403Forbidden,
+                    Title    = "Forbidden",
+                    Detail   = "You do not have permission to access this resource.",
+                    Instance = $"{context.HttpContext.Request.Method} {context.HttpContext.Request.Path}",
+                };
+                problem.Extensions["requestId"] = context.HttpContext.TraceIdentifier;
+
+                context.Response.StatusCode  = StatusCodes.Status403Forbidden;
+                context.Response.ContentType = "application/problem+json";
+                await context.Response.WriteAsJsonAsync(problem);
             }
         };
     });
@@ -166,6 +226,11 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+// 1. Exception handler must be FIRST — catches anything below it
+app.UseExceptionHandler();
+app.UseStatusCodePages();
+
+// 2. CORS
 app.UseCors("AllowFrontend");
 
 // Seed database with test data (only in development)
@@ -187,10 +252,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// 3. Auth — must come before MapControllers
 app.UseAuthentication();
-
 app.UseAuthorization();
 
+// 4. Controllers & Hub
 app.MapControllers();
 
 // Map SignalR hub
