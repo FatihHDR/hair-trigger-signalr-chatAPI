@@ -4,6 +4,7 @@ WORKDIR /App
 
 COPY src/HairTrigger.Chat.Domain/HairTrigger.Chat.Domain.csproj src/HairTrigger.Chat.Domain/
 COPY src/HairTrigger.Chat.Infrastructure/HairTrigger.Chat.Infrastructure.csproj src/HairTrigger.Chat.Infrastructure/
+COPY src/HairTrigger.Chat.Worker/HairTrigger.Chat.Worker.csproj src/HairTrigger.Chat.Worker/
 COPY src/HairTrigger.Chat.Api/HairTrigger.Chat.Api.csproj src/HairTrigger.Chat.Api/
 
 COPY . ./

@@ -16,6 +16,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add Infrastructure services (DbContext, Redis, Repositories)
 builder.Services.AddInfrastructure(builder.Configuration);
 
+// Register MessageWorker as an in-process background service.
+// It dequeues SendMessageCommand and broadcasts via IHubContext<ChatHub>.
+// Runs in the same process as the Hub — required for in-memory group broadcasts to work.
+builder.Services.AddHostedService<MessageWorker>();
+
 // Return structured JSON errors for all unhandled exceptions and HTTP error codes
 builder.Services.AddProblemDetails(options =>
 {
