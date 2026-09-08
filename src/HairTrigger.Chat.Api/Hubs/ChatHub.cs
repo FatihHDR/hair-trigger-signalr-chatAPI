@@ -33,11 +33,17 @@ public class ChatHub : Hub
 
         // Get user's active rooms and join those groups
         var rooms = await _chatRoomRepository.GetUserRoomsAsync(userId);
-        foreach (var room in rooms)
+        var roomList = rooms.ToList();
+
+        foreach (var room in roomList)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, $"room:{room.Id}");
-            _logger.LogDebug("User {UserReferenceId} joined room group {RoomId}", userId, room.Id);
+            _logger.LogDebug("User {UserReferenceId} auto-joined room group {RoomId} on connect", userId, room.Id);
         }
+
+        _logger.LogInformation(
+            "User {UserReferenceId} connected. Auto-joined {RoomCount} room(s): [{RoomIds}]",
+            userId, roomList.Count, string.Join(", ", roomList.Select(r => r.Id)));
 
         // Enqueue connected event for worker
         await _messageQueue.EnqueueAsync(new UserConnectedCommand(
@@ -65,24 +71,68 @@ public class ChatHub : Hub
     }
 
     /// <summary>
-    /// Sends a message to a chat room. Validates membership and enqueues for worker processing.
+    /// Joins a room's SignalR group to receive real-time messages.
+    /// Called after connecting, or after being added as a participant mid-session.
+    /// </summary>
+    public async Task JoinRoom(Guid roomId)
+    {
+        var userId = GetUserReferenceId();
+
+        var isParticipant = await _chatRoomRepository.IsParticipantAsync(roomId, userId);
+        if (!isParticipant)
+        {
+            _logger.LogWarning(
+                "JoinRoom DENIED — User {UserId} is not a participant of room {RoomId}. " +
+                "ConnectionId: {ConnectionId}",
+                userId, roomId, Context.ConnectionId);
+
+            throw new HubException(
+                $"User '{userId}' is not registered as a participant of room '{roomId}'. " +
+                $"Ask staff to add you via POST /api/v1/rooms/{roomId}/participants.");
+        }
+
+        var room = await _chatRoomRepository.GetByIdAsync(roomId);
+        if (room is { IsActive: false })
+        {
+            _logger.LogWarning(
+                "JoinRoom DENIED — Room {RoomId} is already closed. User {UserId}",
+                roomId, userId);
+
+            throw new HubException($"Room '{roomId}' is closed and no longer accepting connections.");
+        }
+
+        await Groups.AddToGroupAsync(Context.ConnectionId, $"room:{roomId}");
+        _logger.LogInformation(
+            "User {UserId} successfully joined room {RoomId} (ConnectionId: {ConnectionId})",
+            userId, roomId, Context.ConnectionId);
+    }
+
+    /// <summary>
+    /// Sends a message to a chat room. Validates membership and enqueues for processing.
     /// </summary>
     public async Task SendMessageToRoom(Guid roomId, string content)
     {
         var userId = GetUserReferenceId();
-        
+
+        // Validate content first (cheap check)
+        if (string.IsNullOrWhiteSpace(content))
+            throw new HubException("Message content cannot be empty.");
+
+        if (content.Length > 4000)
+            throw new HubException($"Message content is too long ({content.Length} chars). Maximum is 4000 characters.");
+
         // Validate room participation
         var isParticipant = await _chatRoomRepository.IsParticipantAsync(roomId, userId);
         if (!isParticipant)
         {
-            _logger.LogWarning("User {UserReferenceId} attempted to send message to room {RoomId} without participation", userId, roomId);
-            throw new HubException("You are not a participant of this room");
-        }
+            _logger.LogWarning(
+                "SendMessageToRoom DENIED — User {UserId} is not a participant of room {RoomId}. " +
+                "ConnectionId: {ConnectionId}",
+                userId, roomId, Context.ConnectionId);
 
-        // Validate content
-        if (string.IsNullOrWhiteSpace(content) || content.Length > 4000)
-        {
-            throw new HubException("Message content is invalid or too long");
+            throw new HubException(
+                $"User '{userId}' is not registered as a participant of room '{roomId}'. " +
+                $"Ask staff to add you via POST /api/v1/rooms/{roomId}/participants.");
         }
 
         // Enqueue message command for worker to process
@@ -94,45 +144,57 @@ public class ChatHub : Hub
             EnqueuedAt: DateTime.UtcNow
         ));
 
-        _logger.LogDebug("Message queued from user {UserReferenceId} to room {RoomId}", userId, roomId);
+        _logger.LogDebug("Message queued from user {UserId} to room {RoomId}", userId, roomId);
     }
 
     /// <summary>
-    /// Joins a room group (called after being added as a participant)
+    /// Returns debug info about the current user's participation state.
+    /// Useful for diagnosing JoinRoom / SendMessageToRoom failures.
     /// </summary>
-    public async Task JoinRoom(Guid roomId)
+    public async Task<object> GetMyRoomInfo(Guid roomId)
     {
         var userId = GetUserReferenceId();
-
         var isParticipant = await _chatRoomRepository.IsParticipantAsync(roomId, userId);
-        if (!isParticipant)
-        {
-            throw new HubException("You are not a participant of this room");
-        }
+        var room = await _chatRoomRepository.GetByIdAsync(roomId);
+        var allMyRooms = await _chatRoomRepository.GetUserRoomsAsync(userId);
 
-        await Groups.AddToGroupAsync(Context.ConnectionId, $"room:{roomId}");
-        _logger.LogInformation("User {UserReferenceId} joined room {RoomId}", userId, roomId);
+        return new
+        {
+            UserId         = userId,
+            RoomId         = roomId,
+            IsParticipant  = isParticipant,
+            RoomExists     = room != null,
+            RoomIsActive   = room?.IsActive,
+            MyActiveRooms  = allMyRooms.Select(r => new { r.Id, r.RoomType, r.IsActive })
+        };
     }
 
     /// <summary>
-    /// Leaves a room group
+    /// Leaves a room group (client-side only, does not remove from DB).
     /// </summary>
     public async Task LeaveRoom(Guid roomId)
     {
+        var userId = GetUserReferenceId();
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"room:{roomId}");
-        _logger.LogInformation("User {UserReferenceId} left room {RoomId}", GetUserReferenceId(), roomId);
+        _logger.LogInformation("User {UserId} left room {RoomId}", userId, roomId);
     }
 
     private Guid GetUserReferenceId()
     {
         var userIdClaim = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value
                           ?? Context.User?.FindFirst("sub")?.Value;
-        
-        if (Guid.TryParse(userIdClaim, out var userId))
-        {
-            return userId;
-        }
 
-        throw new HubException("Unauthorized: user identifier claim is missing or invalid");
+        if (Guid.TryParse(userIdClaim, out var userId))
+            return userId;
+
+        _logger.LogError(
+            "GetUserReferenceId failed — JWT has no valid 'sub' claim. " +
+            "ConnectionId: {ConnectionId}, Claims: [{Claims}]",
+            Context.ConnectionId,
+            string.Join(", ", Context.User?.Claims.Select(c => $"{c.Type}={c.Value}") ?? []));
+
+        throw new HubException(
+            "Unauthorized: JWT is missing a valid user identifier ('sub' claim). " +
+            "Make sure you are using a token issued by backend-isj.");
     }
 }
