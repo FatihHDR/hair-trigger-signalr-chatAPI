@@ -51,9 +51,6 @@ builder.Services.AddCors(options =>
             if (origin.EndsWith(".898isj.id") || origin == "https://898isj.id" || origin == "http://898isj.id")
                 return true;
 
-            // Allow all vyg.re subdomains (isj-dev.vyg.re, etc.)
-            if (origin.EndsWith(".vyg.re") || origin == "https://vyg.re")
-                return true;
 
             // Check AllowedOrigins from configuration (appsettings.json / env vars)
             var configOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
