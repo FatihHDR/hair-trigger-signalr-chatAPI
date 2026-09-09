@@ -43,14 +43,26 @@ builder.Services.AddCors(options =>
         {
             if (string.IsNullOrWhiteSpace(origin)) return false;
 
-            // Allow localhost on any port (3000, 5173, 4200, 3001, etc.)
-            if (origin.StartsWith("http://localhost:") || origin.StartsWith("https://localhost:") || origin == "http://localhost" || origin == "https://localhost")
-                return true;
+            // Try Uri host matching first
+            if (Uri.TryCreate(origin, UriKind.Absolute, out var uri))
+            {
+                var host = uri.Host;
 
-            // Allow 898isj.id domain and subdomains
-            if (origin.EndsWith(".898isj.id") || origin == "https://898isj.id" || origin == "http://898isj.id")
-                return true;
+                // Allow localhost on any port (3000, 5173, 4200, 3001, etc.)
+                if (host.Equals("localhost", StringComparison.OrdinalIgnoreCase) || host.Equals("127.0.0.1"))
+                    return true;
 
+                // Allow 898isj.id domain and subdomains (*.898isj.id)
+                if (host.Equals("898isj.id", StringComparison.OrdinalIgnoreCase) || 
+                    host.EndsWith(".898isj.id", StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+
+            // Fallback string matching for 898isj.id
+            if (origin.EndsWith(".898isj.id", StringComparison.OrdinalIgnoreCase) || 
+                origin.Equals("https://898isj.id", StringComparison.OrdinalIgnoreCase) || 
+                origin.Equals("http://898isj.id", StringComparison.OrdinalIgnoreCase))
+                return true;
 
             // Check AllowedOrigins from configuration (appsettings.json / env vars)
             var configOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
@@ -68,7 +80,6 @@ builder.Services.AddCors(options =>
 
             return false;
         })
-        .SetIsOriginAllowedToAllowWildcardSubdomains()
         .AllowAnyMethod()
         .AllowAnyHeader()
         .WithExposedHeaders("x-signalr-user-agent")
